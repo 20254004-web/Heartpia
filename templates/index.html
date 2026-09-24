@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2型色覚向け色補正アプリ</title>
+
+<style>
+body {
+    font-family: sans-serif;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 32px;
+}
+
+button {
+    font-size: 20px;
+    padding: 10px 20px;
+    margin: 10px 0;
+}
+
+video, canvas {
+    width: 640px;
+    max-width: 100%;
+    display: block;
+    margin-top: 20px;
+}
+
+#status {
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.test {
+    margin-top: 30px;
+}
+
+.colors {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.box {
+    width: 150px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+}
+
+.red {
+    background: red;
+}
+
+.green {
+    background: green;
+}
+
+.orange {
+    background: orange;
+}
+
+.blue {
+    background: blue;
+}
+.video-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.video-container video,
+.video-container canvas {
+    width: 45%;
+}
+@media (max-width: 600px) {
+    .video-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .video-container video,
+    .video-container canvas {
+        width: 100%;
+    }
+}
+button {
+    font-size: 20px;
+    padding: 12px 20px;
+    margin: 8px;
+}
+
+input[type="range"] {
+    width: 80%;
+    height: 30px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🌈 2型色覚向け色補正アプリ</h1>
+
+<button onclick="startCamera()">📷 カメラ開始</button>
+
+<p id="status">カメラを開始してください</p>
+
+<button id="toggleCorrection">🌈 色補正：ON</button>
+
+<div class="strength">
+  <p>色補正の強さ：<span id="strengthValue">20</span>%</p>
+  <span>弱い</span>
+  <input type="range" id="strength" min="0" max="100" value="20">
+  <span>強い</span>
+</div>
+
+<div class="video-container">
+
+<video id="video" autoplay playsinline></video>
+
+<canvas id="canvas"></canvas>
+
+</div>
+
+<div class="test">
+
+<h2>🌈 色補正テスト</h2>
+
+<p>赤・緑・オレンジ・青の色を表示しています。</p>
+
+<div class="colors">
+
+<div class="box red">
+赤
+</div>
+
+<div class="box green">
+緑
+</div>
+
+<div class="box orange">
+オレンジ
+</div>
+
+<div class="box blue">
+青
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let cameraStarted = false;
+
+async function startCamera() {
+
+    try {
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+        });
+
+        video.srcObject = stream;
+
+        cameraStarted = true;
+
+        document.getElementById("status").textContent =
+            "カメラ起動中・リアルタイム色補正中";
+
+        video.onloadedmetadata = () => {
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            correctCamera();
+
+        };
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById("status").textContent =
+            "カメラを使用できませんでした";
+
+    }
+}
+
+
+function correctCamera() {
+
+    if (!cameraStarted) {
+        return;
+    }
+
+    ctx.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const imageData = ctx.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+
+        let r = data[i];
+        let g = data[i + 1];
+        let b = data[i + 2];
+
+        /*
+         2型色覚向けの簡易補正
+
+         赤と緑の差を少し強調する
+        */
+
+        let difference = r - g;
+
+       if (correctionEnabled) {
+    const correction = Number(strengthSlider.value) / 100;
+
+    r = r + difference * correction;
+    g = g - difference * correction;
+}
+
+        r = Math.max(0, Math.min(255, r));
+        g = Math.max(0, Math.min(255, g));
+
+        data[i] = r;
+        data[i + 1] = g;
+        data[i + 2] = b;
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    requestAnimationFrame(correctCamera);
+}
+
+const strengthSlider = document.getElementById("strength");
+const strengthValueLabel = document.getElementById("strengthValue");
+
+strengthSlider.addEventListener("input", () => {
+  strengthValueLabel.textContent = strengthSlider.value;
+});
+let correctionEnabled = true;
+
+const toggleCorrection = document.getElementById("toggleCorrection");
+
+toggleCorrection.addEventListener("click", () => {
+  correctionEnabled = !correctionEnabled;
+  toggleCorrection.textContent =
+    correctionEnabled ? "🌈 色補正：ON" : "🌈 色補正：OFF";
+});
+</script>
+
+</body>
+</html>
