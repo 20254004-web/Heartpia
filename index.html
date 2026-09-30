@@ -99,6 +99,15 @@ input[type="range"] {
     width: 80%;
     height: 30px;
 }
+
+.video-container.daily-mode video {
+    display: none;
+}
+
+.video-container.daily-mode canvas {
+    width: 100%;
+}
+
 </style>
 </head>
 
@@ -109,6 +118,11 @@ input[type="range"] {
 <button onclick="startCamera('environment')">📷 外カメラ</button>
 <button onclick="startCamera('user')">🤳 内カメラ</button>
 <button onclick="stopCamera()">⏹ カメラ停止</button>
+
+<br>
+
+<button onclick="setDisplayMode('research')">🔬 研究モード（2画面）</button>
+<button onclick="setDisplayMode('daily')">📱 日常モード（1画面）</button>
 
 <p id="status">カメラを開始してください</p>
 
@@ -272,6 +286,16 @@ function correctCamera() {
     ctx.putImageData(imageData, 0, 0);
 
     requestAnimationFrame(correctCamera);
+}
+
+function setDisplayMode(mode) {
+    const videoContainer = document.querySelector(".video-container");
+
+    if (mode === "daily") {
+        videoContainer.classList.add("daily-mode");
+    } else {
+        videoContainer.classList.remove("daily-mode");
+    }
 }
 
 const strengthSlider = document.getElementById("strength");
