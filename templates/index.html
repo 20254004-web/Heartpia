@@ -107,6 +107,21 @@ input[type="range"] {
 .video-container.daily-mode canvas {
     width: 100%;
 }
+.video-container.fullscreen-mode {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background: black;
+}
+
+.video-container.fullscreen-mode canvas {
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain;
+}
 
 </style>
 </head>
@@ -301,11 +316,7 @@ function setDisplayMode(mode) {
 function toggleFullscreen() {
     const videoContainer = document.querySelector(".video-container");
 
-    if (!document.fullscreenElement) {
-        videoContainer.requestFullscreen();
-    } else {
-        document.exitFullscreen();
-    }
+    videoContainer.classList.toggle("fullscreen-mode");
 }
 
 const strengthSlider = document.getElementById("strength");
