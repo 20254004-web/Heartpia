@@ -106,7 +106,9 @@ input[type="range"] {
 
 <h1>🌈 2型色覚向け色補正アプリ</h1>
 
-<button onclick="startCamera()">📷 カメラ開始</button>
+<button onclick="startCamera('environment')">📷 外カメラ</button>
+<button onclick="startCamera('user')">🤳 内カメラ</button>
+<button onclick="stopCamera()">⏹ カメラ停止</button>
 
 <p id="status">カメラを開始してください</p>
 
@@ -163,14 +165,14 @@ const ctx = canvas.getContext("2d");
 
 let cameraStarted = false;
 
-async function startCamera() {
+async function startCamera(cameraMode) {
 
     try {
 
        const stream = await navigator.mediaDevices.getUserMedia({
     video: {
         facingMode: {
-            ideal: "environment"
+            exact: cameraMode
         }
     },
     audio: false
@@ -202,6 +204,17 @@ async function startCamera() {
     }
 }
 
+function stopCamera() {
+    if (video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+    }
+
+    cameraStarted = false;
+
+    document.getElementById("status").textContent =
+        "カメラを停止しました";
+}
 
 function correctCamera() {
 
