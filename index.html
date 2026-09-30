@@ -120,7 +120,7 @@ input[type="range"] {
 .video-container.fullscreen-mode canvas {
     width: 100vw;
     height: 100vh;
-    object-fit: contain;
+    object-fit: cover;
 }
 
 </style>
@@ -315,8 +315,15 @@ function setDisplayMode(mode) {
 }
 function toggleFullscreen() {
     const videoContainer = document.querySelector(".video-container");
+    const button = document.getElementById("fullscreenButton");
 
     videoContainer.classList.toggle("fullscreen-mode");
+
+    if (videoContainer.classList.contains("fullscreen-mode")) {
+        button.textContent = "🔙 全画面を終了";
+    } else {
+        button.textContent = "⛶ 全画面";
+    }
 }
 
 const strengthSlider = document.getElementById("strength");
