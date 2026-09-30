@@ -166,6 +166,7 @@ const ctx = canvas.getContext("2d");
 let cameraStarted = false;
 
 async function startCamera(cameraMode) {
+    stopCamera();
 
     try {
 
