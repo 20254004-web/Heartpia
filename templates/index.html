@@ -211,12 +211,13 @@ async function startCamera(cameraMode) {
     height: {
         ideal: 720
     },
-    frameRate: {
+        frameRate: {
         ideal: 30,
         max: 30
-    },
-    audio: false
-}
+    }
+},
+audio: false
+});
 
         video.srcObject = stream;
 
