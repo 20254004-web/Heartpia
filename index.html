@@ -277,6 +277,10 @@ function correctCamera() {
 
     const data = imageData.data;
 
+const correction = correctionEnabled
+    ? Number(strengthSlider.value) / 100
+    : 0;
+
     for (let i = 0; i < data.length; i += 4) {
 
         let r = data[i];
@@ -291,12 +295,8 @@ function correctCamera() {
 
         let difference = r - g;
 
-       if (correctionEnabled) {
-    const correction = Number(strengthSlider.value) / 100;
-
-    r = r + difference * correction;
-    g = g - difference * correction;
-}
+       r = r + difference * correction;
+g = g - difference * correction;
 
         r = Math.max(0, Math.min(255, r));
         g = Math.max(0, Math.min(255, g));
